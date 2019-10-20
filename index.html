@@ -1,23 +1,83 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Akanksha.Life | Be Good, Do Good, Feel Good</title>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-120207424-2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+﻿  <html>
+   <!-- 
+     Belajar dan belajar mulai dari yang sederhana, namun semakin belajar semakin banyak yang tidak tahu.
+     Learn and learn from small things. The more we learn, the more we don't know. 
+     Dirk L. Nicolaas - Sulawesi Utara - Indonesia
+   -->
+  <head>
 
-  gtag('config', 'UA-120207424-2');
-</script>
-	
-</head>
-<body style="margin: 0">
-<div style="width: 100%; height: 100vh">
-	
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/z9BPMjL44Aw?autoplay=1&showinfo=0&controls=0&iv_load_policy=3&loop=1&modestbranding=1"  frameborder="0" allow="picture-in-picture" allowfullscreen></iframe>
-</div>
+  <TITLE>Akanksha.Life | Be Good, Do Good, Feel Good</TITLE>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-</body>
+  
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <script src="confetti.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Exo&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Neucha&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Mansalva&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css?family=Handlee&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Schoolbell&display=swap" rel="stylesheet">
+
+  </head>
+  <body style="margin: 0;padding: 0; width: 100%; height: 100vh;">
+      
+      <canvas id="my-canvas" style="height: 100vh;width: 100%; margin:0; padding: 0; position:absolute;"></canvas>
+
+        <span id="X" title="close">[ x ]
+        </span>
+      <div id="container">
+        
+        <div id="MP3Lyrics">
+            <div id="MP3LyricsHolder">
+                <div id="lyricDisplay"></div>
+            </div>
+            <audio id="player" controls autoplay style="display:none">
+                <source id="mp3_source">
+            </audio>
+            <div id="lyricsContainer"></div>
+            
+            <select id="musicSelector" value="ABBA - Super Trouper.mp3" class="select-css">
+                <option value="">- Select A Song To Play -</option>
+            </select>
+            
+            <div id="main" style="display:none;">
+                <play id="play" ></play>
+                <div id="progress">
+                    <div id="bar"></div>
+                </div>
+                <div id="VolumeSVG"></div>
+                <input type="range" id="VolumeValue" step="0" min="0" max="100" value="50">
+            </div>
+        </div>
+
+      </div>
+
+
+  </body>
+  <script>
+    
+
+function getFile(t) {
+  ID3v2.handleFiles(t, getMP3Data)
+}
+
+function getURL(t) {
+  ID3v2.parseURL(t, getMP3Data)
+}
+
+function htmlId(t) {
+  return document.getElementById(t)
+}
+
+function getMP3Data(t) {
+  var e, l;
+  return mp3 = ID3v2.MP3Data(t), mp3.Lyrics ? (htmlId("lyrics").style.display = "", e = mp3.Lyrics) : (htmlId("lyrics").style.display = "none", e = ""), mp3.Pictures ? (htmlId("pic").style.display = "", l = mp3.Pictures) : (htmlId("pic").style.display = "none", l = ""), htmlId("pic").src = l, htmlId("pic").title = l, htmlId("title").value = mp3.Title, htmlId("title").title = mp3.Title, htmlId("album").value = mp3.Album, htmlId("album").title = mp3.Album, htmlId("trackno").value = mp3.TrackNo, htmlId("trackno").title = mp3.TrackNo, htmlId("lead").value = mp3.Artist, htmlId("lead").title = mp3.Artist, htmlId("genre").value = mp3.Genre, htmlId("genre").title = mp3.Genre, htmlId("duration").value = mp3.Duration, htmlId("duration").title = mp3.Duration, htmlId("lyrics").innerText = e, htmlId("lyrics").title = e
+}
+
+
+  </script>
 </html>
