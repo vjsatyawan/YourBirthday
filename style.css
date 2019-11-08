@@ -67,12 +67,12 @@ a:hover {
     position: relative
 }
 .mhn-ui-date-time .mhn-ui-time {
-    font-size: 28px;
-    font-weight: 400;
+    font-size: 22px;
+    font-weight: 300;
     margin-bottom: 15px
 }
 .mhn-ui-date-time .mhn-ui-day {
-    font-size: 24px;
+    font-size: 22px;
     margin-bottom: 10px
 }
 .mhn-ui-date-time .mhn-ui-date {
