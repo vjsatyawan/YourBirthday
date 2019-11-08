@@ -1,722 +1,122 @@
+$(function(){
+	mhnUI.setup();
+});
+mhnUI = {
+    pattern: "",
+    setup: function() {
+        this.lock(), this.filter(), this.colors(), this.links.setup(), this.dialog.setup(), setInterval("mhnUI.datetime()", 1e3)
+    },
+    lock: function() {
+        mhnUI.page.hide(), pattern = new PatternLock(".mhn-lock", {
+            margin: 15
+        }), $(".mhn-lock-title").html($(".mhn-lock-title").data("title")), pattern.checkForPattern("7415369121212", function() {
+            $(".mhn-lock-title").html('<span class="mhn-lock-success">Yes! you unlocked pattern</span>'), $(".patt-holder").addClass("patt-success"), setTimeout(function() {
+                pattern.reset(), mhnUI.message()
+            }, 1e3), mhnUI.page.show()
+        }, function() {
+            $(".mhn-lock-title").html('<span class="mhn-lock-failure">Opps! pattern is not correct</span>'), $(".patt-holder").removeClass("patt-success"), setTimeout(function() {
+                pattern.reset(), mhnUI.message()
+            }, 2e3)
+        })
+    },
+    message: function() {
+        $(".mhn-lock-title span").fadeOut(), setTimeout(function() {
+            $(".mhn-lock-title").html($(".mhn-lock-title").data("title")), $(".mhn-lock-title span").fadeIn()
+        }, 500)
+    },
+    datetime: function() {
+        var t = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"),
+            e = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+            n = new Date,
+            i = n.getYear();
+        1e3 > i && (i += 1900);
+        var a = n.getDay(),
+            o = n.getMonth(),
+            s = n.getDate();
+        10 > s && (s = "0" + s);
+        var h = n.getHours(),
+            c = n.getMinutes(),
+            u = n.getSeconds(),
+            l = "AM";
+        h >= 12 && (l = "PM"), h > 12 && (h -= 12), 0 == h && (h = 12), 9 >= c && (c = "0" + c), 9 >= u && (u = "0" + u), $(".mhn-ui-date-time .mhn-ui-day").text(t[a]), $(".mhn-ui-date-time .mhn-ui-date").text(e[o] + " " + s + ", " + i), $(".mhn-ui-date-time .mhn-ui-time").text(h + ":" + c + " " + l), $(".mhn-ui-app-time").text(h + ":" + c + ":" + u + " " + l)
+    },
+    page: {
+        show: function(t) {
+            t = t ? t : "page-home", $(".mhn-ui-page").hide(), $(".mhn-ui-page." + t).show()
+        },
+        hide: function(t) {
+            t = t ? t : "page-lock", $(".mhn-ui-page").hide(), $(".mhn-ui-page." + t).show()
+        }
+    },
+    filter: function() {
+        $(".mhn-ui-filter .mhn-ui-btn").click(function() {
+            $(this).toggleClass("active"), $(".mhn-ui-filter-list").toggle(100)
+        }), $(".mhn-ui-filter-list>div").click(function() {
+            var t = $(this).data("filter");
+            $(this).siblings().removeAttr("class"), $(this).addClass("active");
+            var e = function(t) {
+                $(".mhn-ui-apps .mhn-ui-col").fadeOut(400), $('.mhn-ui-apps .mhn-ui-col[data-filter="' + t + '"]').fadeIn(400)
+            };
+            switch (t) {
+                case "all":
+                    $(".mhn-ui-apps .mhn-ui-col").fadeIn(400);
+                    break;
+                case "general":
+                    e(t);
+                    break;
+                case "social":
+                    e(t);
+                    break;
+                case "credits":
+                    e(t)
+            }
+            $(".mhn-ui-filter-list").toggle(100), $(".mhn-ui-filter .mhn-ui-btn").removeClass("active"), $(".mhn-ui-page-title").text($(this).text())
+        })
+    },
+    colors: function() {
+        $(".mhn-ui-icon span").on("mouseover", function() {
+            $(this).css("background", $(this).data("color"))
+        }).on("mouseout", function() {
+            $(this).removeAttr("style")
+        })
+    },
+    links: {
+        setup: function() {
+            $(".mhn-ui-apps .mhn-ui-icon").click(function() {
+                var t = $(this).data("href"),
+                    e = $(this).data("open");
+                t && mhnUI.links.href(t), e && mhnUI.page.show(e)
+            })
+        },
+        href: function(t) {
+            mhnUI.dialog.show(t)
+        }
+    },
+    dialog: {
+        setup: function() {
+            $('.mhn-ui-dialog-wrap,.mhn-ui-dialog-wrap a[data-action="cancel"]').click(function() {
+                mhnUI.dialog.hide()
+            }), $(".mhn-ui-dialog").click(function(t) {
+                t.stopPropagation()
+            }), $('.mhn-ui-dialog a[data-action="confirm"]').click(function() {
+                setTimeout(function() {
+                    mhnUI.dialog.hide()
+                }, 400)
+            })
+        },
+        show: function(t) {
+            $('.mhn-ui-dialog-wrap a[data-action="confirm"]').attr("href", t), $(".mhn-ui-dialog-wrap").show()
+        },
+        hide: function() {
+            $('.mhn-ui-dialog-wrap a[data-action="confirm"]').removeAttr("href"), $(".mhn-ui-dialog-wrap").fadeOut(400)
+        }
+    }
+};
 
 /*
-
-  Shape Shifter
-  =============
-  A canvas experiment by Kenneth Cachia
-  http://www.kennethcachia.com
-
-  Updated code
-  ------------
-  https://github.com/kennethcachia/Shape-Shifter 
-
+    patternLock.js v 0.5.0
+    Author: Sudhanshu Yadav
+    Copyright (c) 2015 Sudhanshu Yadav - ignitersworld.com , released under the MIT license.
+    Demo on: ignitersworld.com/lab/patternLock.html
 */
-
-
-var S = {
-  init: function () {
-    var action = window.location.href,
-        i = action.indexOf('?a=');
-
-    S.Drawing.init('.canvas');
-    document.body.classList.add('body--ready');
-
-    if (i !== -1) {
-      S.UI.simulate(decodeURI(action).substring(i + 3));
-    } else {
-      S.UI.simulate('Happy|Birthday|Darling|#rectangle|Prabhas||');
-    }
-
-    S.Drawing.loop(function () {
-      S.Shape.render();
-    });
-  }
-};
-
-
-S.Drawing = (function () {
-  var canvas,
-      context,
-      renderFn
-      requestFrame = window.requestAnimationFrame       ||
-                     window.webkitRequestAnimationFrame ||
-                     window.mozRequestAnimationFrame    ||
-                     window.oRequestAnimationFrame      ||
-                     window.msRequestAnimationFrame     ||
-                     function(callback) {
-                       window.setTimeout(callback, 1000 / 60);
-                     };
-
-  return {
-    init: function (el) {
-      canvas = document.querySelector(el);
-      context = canvas.getContext('2d');
-      this.adjustCanvas();
-
-      window.addEventListener('resize', function (e) {
-        S.Drawing.adjustCanvas();
-      });
-    },
-
-    loop: function (fn) {
-      renderFn = !renderFn ? fn : renderFn;
-      this.clearFrame();
-      renderFn();
-      requestFrame.call(window, this.loop.bind(this));
-    },
-
-    adjustCanvas: function () {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    },
-
-    clearFrame: function () {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    },
-
-    getArea: function () {
-      return { w: canvas.width, h: canvas.height };
-    },
-
-    drawCircle: function (p, c) {
-      context.fillStyle = c.render();
-      context.beginPath();
-      context.arc(p.x, p.y, p.z, 0, 2 * Math.PI, true);
-      context.closePath();
-      context.fill();
-    }
-  }
-}());
-
-
-S.UI = (function () {
-  var input = document.querySelector('.ui-input'),
-      ui = document.querySelector('.ui'),
-      help = document.querySelector('.help'),
-      commands = document.querySelector('.commands'),
-      overlay = document.querySelector('.overlay'),
-      canvas = document.querySelector('.canvas'),
-      interval,
-      isTouch = false, //('ontouchstart' in window || navigator.msMaxTouchPoints),
-      currentAction,
-      resizeTimer,
-      time,
-      maxShapeSize = 30,
-      firstAction = true,
-      sequence = [],
-      cmd = '#';
-
-  function formatTime(date) {
-    var h = date.getHours(),
-        m = date.getMinutes(),
-    m = m < 10 ? '0' + m : m;
-    return h + ':' + m;
-  }
-
-  function getValue(value) {
-    return value && value.split(' ')[1];
-  }
-
-  function getAction(value) {
-    value = value && value.split(' ')[0];
-    return value && value[0] === cmd && value.substring(1);
-  }
-
-  function timedAction(fn, delay, max, reverse) {
-    clearInterval(interval);
-    currentAction = reverse ? max : 1;
-    fn(currentAction);
-
-    if (!max || (!reverse && currentAction < max) || (reverse && currentAction > 0)) {
-      interval = setInterval(function () {
-        currentAction = reverse ? currentAction - 1 : currentAction + 1;
-        fn(currentAction);
-
-        if ((!reverse && max && currentAction === max) || (reverse && currentAction === 0)) {
-          clearInterval(interval);
-        }
-      }, delay);
-    }
-  }
-
-  function reset(destroy) {
-    clearInterval(interval);
-    sequence = [];
-    time = null;
-    destroy && S.Shape.switchShape(S.ShapeBuilder.letter(''));
-  }
-
-  function performAction(value) {
-    var action,
-        value,
-        current;
-
-    overlay.classList.remove('overlay--visible');
-    sequence = typeof(value) === 'object' ? value : sequence.concat(value.split('|'));
-    input.value = '';
-    checkInputWidth();
-
-    timedAction(function (index) {
-      current = sequence.shift();
-      action = getAction(current);
-      value = getValue(current);
-
-      switch (action) {
-        case 'countdown':
-          value = parseInt(value) || 10;
-          value = value > 0 ? value : 10;
-
-          timedAction(function (index) {
-            if (index === 0) {
-              if (sequence.length === 0) {
-                S.Shape.switchShape(S.ShapeBuilder.letter(''));
-              } else {
-                performAction(sequence);
-              }
-            } else {
-              S.Shape.switchShape(S.ShapeBuilder.letter(index), true);
-            }
-          }, 1000, value, true);
-          break;
-
-        case 'rectangle':
-          value = value && value.split('x');
-          value = (value && value.length === 2) ? value : [maxShapeSize, maxShapeSize / 2];
-
-          S.Shape.switchShape(S.ShapeBuilder.rectangle(Math.min(maxShapeSize, parseInt(value[0])), Math.min(maxShapeSize, parseInt(value[1]))));
-          break;
-
-        case 'circle':
-          value = parseInt(value) || maxShapeSize;
-          value = Math.min(value, maxShapeSize);
-          S.Shape.switchShape(S.ShapeBuilder.circle(value));
-          break;
-
-        case 'time':
-          var t = formatTime(new Date());
-
-          if (sequence.length > 0) {
-            S.Shape.switchShape(S.ShapeBuilder.letter(t));
-          } else {
-            timedAction(function () {
-              t = formatTime(new Date());
-              if (t !== time) {
-                time = t;
-                S.Shape.switchShape(S.ShapeBuilder.letter(time));
-              }
-            }, 1000);
-          }
-          break;
-
-        default:
-          S.Shape.switchShape(S.ShapeBuilder.letter(current[0] === cmd ? 'What?' : current));
-      }
-    }, 2000, sequence.length);
-  }
-
-  function checkInputWidth(e) {
-    if (input.value.length > 18) {
-      ui.classList.add('ui--wide');
-    } else {
-      ui.classList.remove('ui--wide');
-    }
-
-    if (firstAction && input.value.length > 0) {
-      ui.classList.add('ui--enter');
-    } else {
-      ui.classList.remove('ui--enter');
-    }
-  }
-
-  function bindEvents() {
-    document.body.addEventListener('keydown', function (e) {
-      input.focus();
-
-      if (e.keyCode === 13) {
-        firstAction = false;
-        reset();
-        performAction(input.value);
-      }
-    });
-
-    input.addEventListener('input', checkInputWidth);
-    input.addEventListener('change', checkInputWidth);
-    input.addEventListener('focus', checkInputWidth);
-
-    help.addEventListener('click', function (e) {
-      overlay.classList.toggle('overlay--visible');
-      overlay.classList.contains('overlay--visible') && reset(true);
-    });
-
-    commands.addEventListener('click', function (e) {
-      var el,
-          info,
-          demo,
-          tab,
-          active,
-          url;
-
-      if (e.target.classList.contains('commands-item')) {
-        el = e.target;
-      } else {
-        el = e.target.parentNode.classList.contains('commands-item') ? e.target.parentNode : e.target.parentNode.parentNode;
-      }
-
-      info = el && el.querySelector('.commands-item-info');
-      demo = el && info.getAttribute('data-demo');
-      url = el && info.getAttribute('data-url');
-
-      if (info) {
-        overlay.classList.remove('overlay--visible');
-
-        if (demo) {
-          input.value = demo;
-
-          if (isTouch) {
-            reset();
-            performAction(input.value);
-          } else {
-            input.focus();
-          }
-        } else if (url) {
-          //window.location = url;
-        }
-      }
-    });
-
-    canvas.addEventListener('click', function (e) {
-      overlay.classList.remove('overlay--visible');
-    });
-  }
-
-  function init() {
-    bindEvents();
-    input.focus();
-    isTouch && document.body.classList.add('touch');
-  }
-
-  // Init
-  init();
-
-  return {
-    simulate: function (action) {
-      performAction(action);
-    }
-  }
-}());
-
-
-S.UI.Tabs = (function () {
-  var tabs = document.querySelector('.tabs'),
-      labels = document.querySelector('.tabs-labels'),
-      triggers = document.querySelectorAll('.tabs-label'),
-      panels = document.querySelectorAll('.tabs-panel');
-
-  function activate(i) {
-    triggers[i].classList.add('tabs-label--active');
-    panels[i].classList.add('tabs-panel--active');
-  }
-
-  function bindEvents() {
-    labels.addEventListener('click', function (e) {
-      var el = e.target,
-          index;
-
-      if (el.classList.contains('tabs-label')) {
-        for (var t = 0; t < triggers.length; t++) {
-          triggers[t].classList.remove('tabs-label--active');
-          panels[t].classList.remove('tabs-panel--active');
-
-          if (el === triggers[t]) {
-            index = t;
-          }
-        }
-
-        activate(index);
-      }
-    });
-  }
-
-  function init() {
-    activate(0);
-    bindEvents();
-  }
-
-  // Init
-  init();
-}());
-
-
-S.Point = function (args) {
-  this.x = args.x;
-  this.y = args.y;
-  this.z = args.z;
-  this.a = args.a;
-  this.h = args.h;
-};
-
-
-S.Color = function (r, g, b, a) {
-  this.r = r;
-  this.g = g;
-  this.b = b;
-  this.a = a;
-};
-
-S.Color.prototype = {
-  render: function () {
-    return 'rgba(' + this.r + ',' +  + this.g + ',' + this.b + ',' + this.a + ')';
-  }
-};
-
-
-S.Dot = function (x, y) {
-  this.p = new S.Point({
-    x: x,
-    y: y,
-    z: 5,
-    a: 1,
-    h: 0
-  });
-
-  this.e = 0.07;
-  this.s = true;
-
-  this.c = new S.Color(255, 255, 255, this.p.a);
-
-  this.t = this.clone();
-  this.q = [];
-};
-
-S.Dot.prototype = {
-  clone: function () {
-    return new S.Point({
-      x: this.x,
-      y: this.y,
-      z: this.z,
-      a: this.a,
-      h: this.h
-    });
-  },
-
-  _draw: function () {
-    this.c.a = this.p.a;
-    S.Drawing.drawCircle(this.p, this.c);
-  },
-
-  _moveTowards: function (n) {
-    var details = this.distanceTo(n, true),
-        dx = details[0],
-        dy = details[1],
-        d = details[2],
-        e = this.e * d;
-
-    if (this.p.h === -1) {
-      this.p.x = n.x;
-      this.p.y = n.y;
-      return true;
-    }
-
-    if (d > 1) {
-      this.p.x -= ((dx / d) * e);
-      this.p.y -= ((dy / d) * e);
-    } else {
-      if (this.p.h > 0) {
-        this.p.h--;
-      } else {
-        return true;
-      }
-    }
-
-    return false;
-  },
-
-  _update: function () {
-    if (this._moveTowards(this.t)) {
-      var p = this.q.shift();
-
-      if (p) {
-        this.t.x = p.x || this.p.x;
-        this.t.y = p.y || this.p.y;
-        this.t.z = p.z || this.p.z;
-        this.t.a = p.a || this.p.a;
-        this.p.h = p.h || 0;
-      } else {
-        if (this.s) {
-          this.p.x -= Math.sin(Math.random() * 3.142);
-          this.p.y -= Math.sin(Math.random() * 3.142);
-        } else {
-          this.move(new S.Point({
-            x: this.p.x + (Math.random() * 50) - 25,
-            y: this.p.y + (Math.random() * 50) - 25,
-          }));
-        }
-      }
-    }
-
-    d = this.p.a - this.t.a;
-    this.p.a = Math.max(0.1, this.p.a - (d * 0.05));
-    d = this.p.z - this.t.z;
-    this.p.z = Math.max(1, this.p.z - (d * 0.05));
-  },
-
-  distanceTo: function (n, details) {
-    var dx = this.p.x - n.x,
-        dy = this.p.y - n.y,
-        d = Math.sqrt(dx * dx + dy * dy);
-
-    return details ? [dx, dy, d] : d;
-  },
-
-  move: function (p, avoidStatic) {
-    if (!avoidStatic || (avoidStatic && this.distanceTo(p) > 1)) {
-      this.q.push(p);
-    }
-  },
-
-  render: function () {
-    this._update();
-    this._draw();
-  }
-}
-
-
-S.ShapeBuilder = (function () {
-  var gap = 13,
-      shapeCanvas = document.createElement('canvas'),
-      shapeContext = shapeCanvas.getContext('2d'),
-      fontSize = 500,
-      fontFamily = 'Avenir, Helvetica Neue, Helvetica, Arial, sans-serif';
-
-  function fit() {
-    shapeCanvas.width = Math.floor(window.innerWidth / gap) * gap;
-    shapeCanvas.height = Math.floor(window.innerHeight / gap) * gap;
-    shapeContext.fillStyle = 'red';
-    shapeContext.textBaseline = 'middle';
-    shapeContext.textAlign = 'center';
-  }
-
-  function processCanvas() {
-    var pixels = shapeContext.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height).data;
-        dots = [],
-        pixels,
-        x = 0,
-        y = 0,
-        fx = shapeCanvas.width,
-        fy = shapeCanvas.height,
-        w = 0,
-        h = 0;
-
-    for (var p = 0; p < pixels.length; p += (4 * gap)) {
-      if (pixels[p + 3] > 0) {
-        dots.push(new S.Point({
-          x: x,
-          y: y
-        }));
-
-        w = x > w ? x : w;
-        h = y > h ? y : h;
-        fx = x < fx ? x : fx;
-        fy = y < fy ? y : fy;
-      }
-
-      x += gap;
-
-      if (x >= shapeCanvas.width) {
-        x = 0;
-        y += gap;
-        p += gap * 4 * shapeCanvas.width;
-      }
-    }
-
-    return { dots: dots, w: w + fx, h: h + fy };
-  }
-
-  function setFontSize(s) {
-    shapeContext.font = 'bold ' + s + 'px ' + fontFamily;
-  }
-
-  function isNumber(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  }
-
-  function init() {
-    fit();
-    window.addEventListener('resize', fit);
-  }
-
-  // Init
-  init();
-
-  return {
-    imageFile: function (url, callback) {
-      var image = new Image(),
-          a = S.Drawing.getArea();
-
-      image.onload = function () {
-        shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
-        shapeContext.drawImage(this, 0, 0, a.h * 0.6, a.h * 0.6);
-        callback(processCanvas());
-      };
-
-      image.onerror = function () {
-        callback(S.ShapeBuilder.letter('What?'));
-      }
-
-      image.src = url;
-    },
-
-    circle: function (d) {
-      var r = Math.max(0, d) / 2;
-      shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
-      shapeContext.beginPath();
-      shapeContext.arc(r * gap, r * gap, r * gap, 0, 2 * Math.PI, false);
-      shapeContext.fill();
-      shapeContext.closePath();
-
-      return processCanvas();
-    },
-
-    letter: function (l) {
-      var s = 0;
-
-      setFontSize(fontSize);
-      s = Math.min(fontSize,
-                  (shapeCanvas.width / shapeContext.measureText(l).width) * 0.8 * fontSize, 
-                  (shapeCanvas.height / fontSize) * (isNumber(l) ? 1 : 0.45) * fontSize);
-      setFontSize(s);
-
-      shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
-      shapeContext.fillText(l, shapeCanvas.width / 2, shapeCanvas.height / 2);
-
-      return processCanvas();
-    },
-
-    rectangle: function (w, h) {
-      var dots = [],
-          width = gap * w,
-          height = gap * h;
-
-      for (var y = 0; y < height; y += gap) {
-        for (var x = 0; x < width; x += gap) {
-          dots.push(new S.Point({
-            x: x,
-            y: y,
-          }));
-        }
-      }
-
-      return { dots: dots, w: width, h: height };
-    }
-  };
-}());
-
-
-S.Shape = (function () {
-  var dots = [],
-      width = 0,
-      height = 0,
-      cx = 0,
-      cy = 0;
-
-  function compensate() {
-    var a = S.Drawing.getArea();
-
-    cx = a.w / 2 - width / 2;
-    cy = a.h / 2 - height / 2;
-  }
-
-  return {
-    shuffleIdle: function () {
-      var a = S.Drawing.getArea();
-
-      for (var d = 0; d < dots.length; d++) {
-        if (!dots[d].s) {
-          dots[d].move({
-            x: Math.random() * a.w,
-            y: Math.random() * a.h
-          });
-        }
-      }
-    },
-
-    switchShape: function (n, fast) {
-      var size,
-          a = S.Drawing.getArea();
-
-      width = n.w;
-      height = n.h;
-
-      compensate();
-
-      if (n.dots.length > dots.length) {
-        size = n.dots.length - dots.length;
-        for (var d = 1; d <= size; d++) {
-          dots.push(new S.Dot(a.w / 2, a.h / 2));
-        }
-      }
-
-      var d = 0,
-          i = 0;
-
-      while (n.dots.length > 0) {
-        i = Math.floor(Math.random() * n.dots.length);
-        dots[d].e = fast ? 0.25 : (dots[d].s ? 0.14 : 0.11);
-
-        if (dots[d].s) {
-          dots[d].move(new S.Point({
-            z: Math.random() * 20 + 10,
-            a: Math.random(),
-            h: 18
-          }));
-        } else {
-          dots[d].move(new S.Point({
-            z: Math.random() * 5 + 5,
-            h: fast ? 18 : 30
-          }));
-        }
-
-        dots[d].s = true;
-        dots[d].move(new S.Point({
-          x: n.dots[i].x + cx,
-          y: n.dots[i].y + cy,
-          a: 1,
-          z: 5,
-          h: 0
-        }));
-
-        n.dots = n.dots.slice(0, i).concat(n.dots.slice(i + 1));
-        d++;
-      }
-
-      for (var i = d; i < dots.length; i++) {
-        if (dots[i].s) {
-          dots[i].move(new S.Point({
-            z: Math.random() * 20 + 10,
-            a: Math.random(),
-            h: 20
-          }));
-
-          dots[i].s = false;
-          dots[i].e = 0.04;
-          dots[i].move(new S.Point({ 
-            x: Math.random() * a.w,
-            y: Math.random() * a.h,
-            a: 0.3, //.4
-            z: Math.random() * 4,
-            h: 0
-          }));
-        }
-      }
-    },
-
-    render: function () {
-      for (var d = 0; d < dots.length; d++) {
-        dots[d].render();
-      }
-    }
-  }
-}());
-
-
-S.init();
+!function(t,e,n,a){"use strict";function r(t){for(var e=t.holder,n=t.option,a=n.matrix,r=n.margin,i=n.radius,o=['<ul class="patt-wrap" style="padding:'+r+'px">'],s=0,l=a[0]*a[1];l>s;s++)o.push('<li class="patt-circ" style="margin:'+r+"px; width : "+2*i+"px; height : "+2*i+"px; -webkit-border-radius: "+i+"px; -moz-border-radius: "+i+"px; border-radius: "+i+'px; "><div class="patt-dots"></div></li>');o.push("</ul>"),e.html(o.join("")).css({width:a[1]*(2*i+2*r)+2*r+"px",height:a[0]*(2*i+2*r)+2*r+"px"}),t.pattCircle=t.holder.find(".patt-circ")}function i(t,e,n,a){var r=e-t,i=a-n;return{length:Math.ceil(Math.sqrt(r*r+i*i)),angle:Math.round(180*Math.atan2(i,r)/Math.PI)}}function o(){}function s(e,n){var a=this,i=a.token=Math.random(),h=p[i]=new o,u=h.holder=t(e);if(0!=u.length){h.object=a,n=h.option=t.extend({},s.defaults,n),r(h),u.addClass("patt-holder"),"static"==u.css("position")&&u.css("position","relative"),u.on("touchstart mousedown",function(t){d.call(this,t,a)}),h.option.onDraw=n.onDraw||l;var c=n.mapper;h.mapperFunc="object"==typeof c?function(t){return c[t]}:"function"==typeof c?c:l,h.option.mapper=null}}var l=function(){},p={},d=function(e,a){e.preventDefault();var r=p[a.token];if(!r.disabled){r.option.patternVisible||r.holder.addClass("patt-hidden");var i="touchstart"==e.type?"touchmove":"mousemove",o="touchstart"==e.type?"touchend":"mouseup";t(this).on(i+".pattern-move",function(t){h.call(this,t,a)}),t(n).one(o,function(){u.call(this,e,a)});var s=r.holder.find(".patt-wrap"),l=s.offset();r.wrapTop=l.top,r.wrapLeft=l.left,a.reset()}},h=function(e,n){e.preventDefault();var a=e.pageX||e.originalEvent.touches[0].pageX,r=e.pageY||e.originalEvent.touches[0].pageY,o=p[n.token],s=o.pattCircle,l=o.patternAry,d=o.option.lineOnMove,h=o.getIdxFromPoint(a,r),u=h.idx,c=o.mapperFunc(u)||u;if(l.length>0){var f=i(o.lineX1,h.x,o.lineY1,h.y);o.line.css({width:f.length+10+"px",transform:"rotate("+f.angle+"deg)"})}if(u){if(-1==l.indexOf(c)){var v,m=t(s[u-1]);if(o.lastPosObj){for(var g=o.lastPosObj,x=g.i,w=g.j,b=Math.abs(h.i-x),j=Math.abs(h.j-w);(0==b&&j>1||0==j&&b>1||j==b&&j>1)&&(w!=h.j||x!=h.i);){x=b?Math.min(h.i,x)+1:x,w=j?Math.min(h.j,w)+1:w,b=Math.abs(h.i-x),j=Math.abs(h.j-w);var M=(w-1)*o.option.matrix[1]+x,y=o.mapperFunc(M)||M;-1==l.indexOf(y)&&(t(s[M-1]).addClass("hovered"),l.push(y))}v=[],h.j-g.j>0?v.push("s"):h.j-g.j<0?v.push("n"):0,h.i-g.i>0?v.push("e"):h.i-g.i<0?v.push("w"):0,v=v.join("-")}m.addClass("hovered"),l.push(c);var P=o.option.margin,k=o.option.radius,C=(h.i-1)*(2*P+2*k)+2*P+k,O=(h.j-1)*(2*P+2*k)+2*P+k;if(1!=l.length){var D=i(o.lineX1,C,o.lineY1,O);o.line.css({width:D.length+10+"px",transform:"rotate("+D.angle+"deg)"}),d||o.line.show()}v&&(o.lastElm.addClass(v+" dir"),o.line.addClass(v+" dir"));var E=t('<div class="patt-lines" style="top:'+(O-5)+"px; left:"+(C-5)+'px"></div>');o.line=E,o.lineX1=C,o.lineY1=O,o.holder.append(E),d||o.line.hide(),o.lastElm=m}o.lastPosObj=h}},u=function(t,e){t.preventDefault();var n=p[e.token],a=n.patternAry.join("");n.holder.off(".pattern-move").removeClass("patt-hidden"),a&&(n.option.onDraw(a),n.line.remove(),n.rightPattern&&(a==n.rightPattern?n.onSuccess():(n.onError(),e.error())))};o.prototype={constructor:o,getIdxFromPoint:function(t,e){var n=this.option,a=n.matrix,r=t-this.wrapLeft,i=e-this.wrapTop,o=null,s=n.margin,l=2*n.radius+2*s,p=Math.ceil(r/l),d=Math.ceil(i/l),h=r%l,u=i%l;return p<=a[1]&&d<=a[0]&&h>2*s&&u>2*s&&(o=(d-1)*a[1]+p),{idx:o,i:p,j:d,x:r,y:i}}},s.prototype={constructor:s,option:function(t,e){var n=p[this.token],i=n.option;return e===a?i[t]:(i[t]=e,void(("margin"==t||"matrix"==t||"radius"==t)&&r(n)))},getPattern:function(){return p[this.token].patternAry.join("")},setPattern:function(t){var e=p[this.token],n=e.option,a=n.matrix,r=n.margin,i=n.radius;if(n.enableSetPattern){this.reset(),e.wrapLeft=0,e.wrapTop=0;for(var o=0;o<t.length;o++){var s=t[o]-1,d=s%a[1],u=Math.floor(s/a[1]),c=d*(2*r+2*i)+2*r+i,f=u*(2*r+2*i)+2*r+i;h.call(null,{pageX:c,pageY:f,preventDefault:l,originalEvent:{touches:[{pageX:c,pageY:f}]}},this)}}},enable:function(){var t=p[this.token];t.disabled=!1},disable:function(){var t=p[this.token];t.disabled=!0},reset:function(){var t=p[this.token];t.pattCircle.removeClass("hovered dir s n w e s-w s-e n-w n-e"),t.holder.find(".patt-lines").remove(),t.patternAry=[],t.lastPosObj=null,t.holder.removeClass("patt-error patt-success")},error:function(){p[this.token].holder.addClass("patt-error")},checkForPattern:function(t,e,n){var a=p[this.token];a.rightPattern=t,a.onSuccess=e||l,a.onError=n||l}},s.defaults={matrix:[3,3],margin:20,radius:25,patternVisible:!0,lineOnMove:!0,enableSetPattern:!1},e.PatternLock=s}(jQuery,window,document);
