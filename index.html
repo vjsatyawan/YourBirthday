@@ -23,11 +23,17 @@
   gtag('js', new Date());
   gtag('config', 'UA-120207424-2');
 </script>
-
+<script src="confetti-js-master/dist/index.min.js"></script>
+	  <script type="text/javascript">
+		var confettiSettings = { target: 'my-canvas' };
+		var confetti = new ConfettiGenerator(confettiSettings);
+		confetti.render();
+	  </script>
+	  
 </head>
 <body>
 
-
+<canvas id="my-canvas"></canvas>
 	<div class="mhn-ui-wrap">
 	<div class="mhn-ui-page page-lock">
 		<div class="mhn-ui-date-time">
