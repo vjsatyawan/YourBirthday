@@ -2,49 +2,6 @@
 
 body{
 font-family: 'Signika', sans-serif;
-overflow: hidden;
-}
-
-.center-outer {
-display: table;
-width: 100%;
-height: 100%;
-}
-
-.center-inner {
-display: table-cell;
-vertical-align: middle;
-text-align: center;
-}
-
-/* Essential CSS - Makes the effect work */
-
-
-.bubbles {
-display: inline-block;
-font-family: arial;
-position: absolute;
-height: 100vh;
-margin-top: 40vh;
-width:100%;
-}
-
-.bubbles h1,.bubbles h3 {
-position: relative;
-margin: 1em 0 0;
-font-weight: 100 !important;
-font-family: 'Indie Flower', cursive;
-color: #fff;
-text-align: center;
-z-index: 2;
-}
-
-.individual-bubble {
-position: absolute;
-border-radius: 100%;
-bottom: 10px;
-background-color: #fff;
-z-index: 1;
 }
 
 /*gradient text*/
@@ -52,8 +9,7 @@ z-index: 1;
 
 .confetti-button {
   font-family: 'Helvetica', 'Arial', sans-serif;
-  /*display: inline-block;*/
-  display: none;
+  display: inline-block;
   font-size: 1em;
   padding: 1em 2em;
   margin-top: 100px;
