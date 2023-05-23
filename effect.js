@@ -26,7 +26,7 @@ $('document').ready(() => {
   let vw;
   $(window).resize(() => {
     vw = $(window).width() / 2;
-    const fact = vw / 4;
+    const fact = vw / 5;
 
     $('#b1,#b2,#b3,#b4,#b5,#b6,#b7,#b8,#b9').stop();
     $('#b11').animate({ top: 200, left: vw - 4 * fact }, 3500);
@@ -203,7 +203,7 @@ $('document').ready(() => {
 
   $('#wish_message').click(function () {
     vw = $(window).width() / 2;
-    const fact = vw / 4;
+    const fact = vw / 5;
 
     $('#b1,#b2,#b3,#b4,#b5,#b6,#b7,#b8,#b9').stop();
     $('#b1').attr('id', 'b11');
