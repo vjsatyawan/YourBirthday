@@ -1,48 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming Soon</title>
-  <link rel="stylesheet" href="style.css">
-	
-	<style>
-		
-		body {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f2f2f2;
-}
-
-.container {
-  text-align: center;
-}
-
-h1 {
-  font-family: 'Arial', sans-serif;
-  font-size: 32px;
-  color: #333;
-}
-
-/* Media queries for responsiveness */
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 24px;
-  }
-}
-
-		
-	</style>
-	
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivational Quote Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .quote {
+            margin-top: 40px;
+        }
+        
+        .quote p {
+            font-size: 24px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1> :) </h1>
-  </div>
+    <div class="container">
+        <h1>Motivational Quote Generator</h1>
+        <div class="quote">
+            <p id="quoteText"></p>
+        </div>
+        <button class="button" onclick="generateQuote()">Generate Quote</button>
+    </div>
+
+    <script>
+        // Array of motivational quotes
+        var quotes = [
+            "Believe you can and you're halfway there. - Theodore Roosevelt",
+            "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+            "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+            "The only way to do great work is to love what you do. - Steve Jobs",
+            "Your time is limited, don't waste it living someone else's life. - Steve Jobs",
+            "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt",
+            "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
+            "The harder I work, the luckier I get. - Samuel Goldwyn",
+            "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+            "The only person you should try to be better than is the person you were yesterday. - Matty Mullins"
+        ];
+
+        // Function to generate a random quote
+        function generateQuote() {
+            var randomIndex = Math.floor(Math.random() * quotes.length);
+            var quoteElement = document.getElementById("quoteText");
+            quoteElement.innerHTML = quotes[randomIndex];
+        }
+    </script>
 </body>
 </html>
